@@ -20,6 +20,10 @@ ARG BUILD_HASH=dev-build
 ARG UID=0
 ARG GID=0
 
+FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
+ARG BUILD_HASH
+
+user dev-kingdoom
 WORKDIR /app/backend/data
 
 # Kopier package.json og package-lock.json
@@ -37,7 +41,7 @@ ENV APP_BUILD_HASH=${BUILD_HASH}
 # Byg frontend
 RUN npm run build
 
-
+user root
 ######## WebUI backend ########
 FROM python:3.11-slim-bookworm AS base
 
