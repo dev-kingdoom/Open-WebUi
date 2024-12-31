@@ -21,7 +21,7 @@ ARG UID=0
 ARG GID=0
 
 # Skift til den nye bruger
-WORKDIR /app
+WORKDIR /app/backend/data
 
 # Kopier package.json og package-lock.json
 COPY --chown=codespace:codespace package.json package-lock.json ./
