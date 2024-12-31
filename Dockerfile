@@ -20,17 +20,16 @@ ARG BUILD_HASH=dev-build
 ARG UID=0
 ARG GID=0
 
-# Skift til den nye bruger
 WORKDIR /app/backend/data
 
 # Kopier package.json og package-lock.json
-COPY --chown=codespace:codespace package.json package-lock.json ./
+COPY package.json package-lock.json ./
 
 # Installer afhængigheder
 RUN npm ci
 
 # Kopiér resten af applikationen
-COPY --chown=codespace:codespace . .
+COPY . .
 
 # Sæt miljøvariabel
 ENV APP_BUILD_HASH=${BUILD_HASH}
@@ -38,8 +37,6 @@ ENV APP_BUILD_HASH=${BUILD_HASH}
 # Byg frontend
 RUN npm run build
 
-# Skift tilbage til root-bruger (hvis nødvendigt for backend)
-USER root
 
 ######## WebUI backend ########
 FROM python:3.11-slim-bookworm AS base
