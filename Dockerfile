@@ -21,8 +21,6 @@ ARG UID=0
 ARG GID=0
 
 # Skift til den nye bruger
-USER codespace
-
 WORKDIR /app
 
 # Kopier package.json og package-lock.json
