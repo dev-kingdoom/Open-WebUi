@@ -20,31 +20,19 @@ ARG BUILD_HASH=dev-build
 ARG UID=0
 ARG GID=0
 
+######## WebUI frontend ########
 FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
 ARG BUILD_HASH
 
-# Skift til den nye bruger
-USER codespace
-
 WORKDIR /app
 
-# Kopier package.json og package-lock.json
-COPY --chown=codespace:codespace package.json package-lock.json ./
-
-# Installer afhængigheder
+COPY package.json package-lock.json ./
 RUN npm ci
 
-# Kopiér resten af applikationen
-COPY --chown=codespace:codespace . .
-
-# Sæt miljøvariabel
+COPY . .
 ENV APP_BUILD_HASH=${BUILD_HASH}
-
-# Byg frontend
 RUN npm run build
 
-# Skift tilbage til root-bruger (hvis nødvendigt for backend)
-USER root
 ######## WebUI backend ########
 FROM python:3.11-slim-bookworm AS base
 
