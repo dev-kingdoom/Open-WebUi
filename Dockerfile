@@ -23,17 +23,19 @@ ARG GID=0
 FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
 ARG BUILD_HASH
 
-user dev-kingdoom
-WORKDIR /app/backend/data
+# Skift til den nye bruger
+USER dev-kingdoom
+
+WORKDIR /app
 
 # Kopier package.json og package-lock.json
-COPY package.json package-lock.json ./
+COPY --chown=dev-kingdoom:dev-kingdoom package.json package-lock.json ./
 
 # Installer afhængigheder
 RUN npm ci
 
 # Kopiér resten af applikationen
-COPY . .
+COPY --chown=dev-kingdoom:dev-kingdoom . .
 
 # Sæt miljøvariabel
 ENV APP_BUILD_HASH=${BUILD_HASH}
@@ -41,7 +43,8 @@ ENV APP_BUILD_HASH=${BUILD_HASH}
 # Byg frontend
 RUN npm run build
 
-user root
+# Skift tilbage til root-bruger (hvis nødvendigt for backend)
+USER root
 ######## WebUI backend ########
 FROM python:3.11-slim-bookworm AS base
 
