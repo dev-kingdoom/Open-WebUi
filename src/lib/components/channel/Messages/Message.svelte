@@ -8,10 +8,10 @@
 	dayjs.extend(isToday);
 	dayjs.extend(isYesterday);
 
-	import { getContext } from 'svelte';
+	import { getContext, onMount } from 'svelte';
 	const i18n = getContext<Writable<i18nType>>('i18n');
 
-	import { settings, user } from '$lib/stores';
+	import { settings, user, shortCodesToEmojis } from '$lib/stores';
 
 	import { WEBUI_BASE_URL } from '$lib/constants';
 
@@ -26,16 +26,33 @@
 	import Image from '$lib/components/common/Image.svelte';
 	import FileItem from '$lib/components/common/FileItem.svelte';
 	import ProfilePreview from './Message/ProfilePreview.svelte';
+	import ChatBubbleOvalEllipsis from '$lib/components/icons/ChatBubbleOvalEllipsis.svelte';
+	import FaceSmile from '$lib/components/icons/FaceSmile.svelte';
+	import ReactionPicker from './Message/ReactionPicker.svelte';
 
 	export let message;
 	export let showUserProfile = true;
 
 	export let onDelete: Function = () => {};
 	export let onEdit: Function = () => {};
+	let showButtons = false;
 
 	let edit = false;
 	let editedContent = null;
 	let showDeleteConfirmDialog = false;
+
+	let reactions = [
+		{
+			name: 'red_circle',
+			user_ids: ['U07KUHZSYER'],
+			count: 1
+		},
+		{
+			name: '+1',
+			user_ids: [$user.id],
+			count: 1
+		}
+	];
 
 	const formatDate = (inputDate) => {
 		const date = dayjs(inputDate);
@@ -66,29 +83,60 @@
 			? 'pt-1.5 pb-0.5'
 			: ''} w-full {($settings?.widescreenMode ?? null)
 			? 'max-w-full'
-			: 'max-w-5xl'} mx-auto group hover:bg-gray-500/5 transition relative"
+			: 'max-w-5xl'} mx-auto group hover:bg-gray-300/5 dark:hover:bg-gray-700/5 transition relative"
 	>
 		{#if (message.user_id === $user.id || $user.role === 'admin') && !edit}
-			<div class=" absolute invisible group-hover:visible right-1 -top-2 z-30">
+			<div
+				class=" absolute {showButtons ? '' : 'invisible group-hover:visible'} right-1 -top-2 z-30"
+			>
 				<div
 					class="flex gap-1 rounded-lg bg-white dark:bg-gray-850 shadow-md p-0.5 border border-gray-100 dark:border-gray-800"
 				>
-					<button
-						class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
-						on:click={() => {
-							edit = true;
-							editedContent = message.content;
-						}}
-					>
-						<Pencil />
-					</button>
+					<ReactionPicker onClose={() => (showButtons = false)}>
+						<Tooltip content={$i18n.t('Add Reaction')}>
+							<button
+								class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
+								on:click={() => {
+									showButtons = true;
+								}}
+							>
+								<FaceSmile />
+							</button>
+						</Tooltip>
+					</ReactionPicker>
 
-					<button
-						class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
-						on:click={() => (showDeleteConfirmDialog = true)}
-					>
-						<GarbageBin />
-					</button>
+					<Tooltip content={$i18n.t('Reply in Thread')}>
+						<button
+							class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
+							on:click={() => {
+								edit = true;
+								editedContent = message.content;
+							}}
+						>
+							<ChatBubbleOvalEllipsis />
+						</button>
+					</Tooltip>
+
+					<Tooltip content={$i18n.t('Edit')}>
+						<button
+							class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
+							on:click={() => {
+								edit = true;
+								editedContent = message.content;
+							}}
+						>
+							<Pencil />
+						</button>
+					</Tooltip>
+
+					<Tooltip content={$i18n.t('Delete')}>
+						<button
+							class="hover:bg-gray-100 dark:hover:bg-gray-800 transition rounded-lg p-1"
+							on:click={() => (showDeleteConfirmDialog = true)}
+						>
+							<GarbageBin />
+						</button>
+					</Tooltip>
 				</div>
 			</div>
 		{/if}
@@ -222,6 +270,50 @@
 								>(edited)</span
 							>{/if}
 					</div>
+
+					{#if reactions.length > 0}
+						<div>
+							<div class="flex items-center gap-1 mt-1 mb-2">
+								{#each reactions as reaction}
+									<button
+										class="flex items-center gap-1.5 transition rounded-xl px-2 py-1 cursor-pointer {reaction.user_ids.includes(
+											$user.id
+										)
+											? ' bg-blue-500/10 outline outline-blue-500/50 outline-1'
+											: 'bg-gray-500/10 hover:outline hover:outline-gray-700/30 dark:hover:outline-gray-300/30 hover:outline-1'}"
+									>
+										{#if $shortCodesToEmojis[reaction.name]}
+											<img
+												src="/assets/emojis/{$shortCodesToEmojis[reaction.name].toLowerCase()}.svg"
+												alt={reaction.name}
+												class=" size-4"
+											/>
+										{:else}
+											<div>
+												{reaction.name}
+											</div>
+										{/if}
+
+										{#if reaction.user_ids.length > 0}
+											<div class="text-xs font-medium text-gray-500 dark:text-gray-400">
+												{reaction.user_ids?.length}
+											</div>
+										{/if}
+									</button>
+								{/each}
+
+								<ReactionPicker>
+									<Tooltip content={$i18n.t('Add Reaction')}>
+										<div
+											class="flex items-center gap-1.5 bg-gray-500/10 hover:outline hover:outline-gray-700/30 dark:hover:outline-gray-300/30 hover:outline-1 transition rounded-xl px-1 py-1 cursor-pointer text-gray-500 dark:text-gray-400"
+										>
+											<FaceSmile />
+										</div>
+									</Tooltip>
+								</ReactionPicker>
+							</div>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		</div>
