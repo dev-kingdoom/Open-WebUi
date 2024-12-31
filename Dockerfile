@@ -24,7 +24,7 @@ FROM --platform=$BUILDPLATFORM node:22-alpine3.20 AS build
 ARG BUILD_HASH
 
 # Skift til den nye bruger
-USER dev-kingdoom
+USER codespace
 
 WORKDIR /app
 
