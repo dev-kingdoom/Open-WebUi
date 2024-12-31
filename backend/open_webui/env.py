@@ -99,9 +99,9 @@ for source in log_sources:
 log.setLevel(SRC_LOG_LEVELS["CONFIG"])
 
 
-WEBUI_NAME = os.environ.get("WEBUI_NAME", "2Pac AI")
-if WEBUI_NAME != "2Pac AI":
-    WEBUI_NAME += " (2Pac AI)"
+WEBUI_NAME = os.environ.get("WEBUI_NAME", "AI Kingdom")
+if WEBUI_NAME != "AI Kingdom":
+    WEBUI_NAME += " (AI Kingdom)"
 
 WEBUI_FAVICON_URL = "https://openwebui.com/favicon.png"
 
