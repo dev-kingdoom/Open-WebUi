@@ -29,13 +29,13 @@ USER dev-kingdoom
 WORKDIR /app
 
 # Kopier package.json og package-lock.json
-COPY --chown=dev-kingdoom:dev-kingdoom package.json package-lock.json ./
+COPY --chown=codespace:codespace package.json package-lock.json ./
 
 # Installer afhængigheder
 RUN npm ci
 
 # Kopiér resten af applikationen
-COPY --chown=dev-kingdoom:dev-kingdoom . .
+COPY --chown=codespace:codespace . .
 
 # Sæt miljøvariabel
 ENV APP_BUILD_HASH=${BUILD_HASH}
