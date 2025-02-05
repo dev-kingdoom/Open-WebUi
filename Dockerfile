@@ -9,7 +9,7 @@ ARG USE_CUDA_VER=cu121
 # Leaderboard: https://huggingface.co/spaces/mteb/leaderboard 
 # for better performance and multilangauge support use "intfloat/multilingual-e5-large" (~2.5GB) or "intfloat/multilingual-e5-base" (~1.5GB)
 # IMPORTANT: If you change the embedding model (sentence-transformers/all-MiniLM-L6-v2) and vice versa, you aren't able to use RAG Chat with your previous documents loaded in the WebUI! You need to re-embed them.
-ARG USE_EMBEDDING_MODEL=nomic-embed-text
+ARG USE_EMBEDDING_MODEL=nomic-embed-text-v1.5
 ARG USE_RERANKING_MODEL=BAAI/bge-reranker-v2-m3
 
 # Tiktoken encoding name; models to use can be found at https://huggingface.co/models?library=tiktoken
